@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	log "github.com/sirupsen/logrus"
@@ -17,14 +17,14 @@ func main() {
 	logger.InitLogger()
 
 	repository := repository.NewRepository(db.GetDB())
-	usecase := usecase.NewUseCase(repository)
-	handlers := handler.NewHandler(usecase)
+	usecase := usecase.NewUseCase(&repository)
+	handlers := handler.NewHandler(&usecase)
 	router := handlers.Handle()
 
 	err := http.ListenAndServe(":"+port, router)
 	if err != nil {
-		log.Fatalf("Connection failed: %s\n", err.Error())
+		log.Fatalf("connection failed: %s\n", err.Error())
 	}
 
-	log.Infof("Server is running on port %s\n", port)
+	log.Infof("server is running on port %s\n", port)
 }
