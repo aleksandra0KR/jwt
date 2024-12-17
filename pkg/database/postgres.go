@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"jwt/domain"
 	"os"
 )
 
@@ -43,7 +44,28 @@ func InitializeDBPostgres(maxIdleConnections, maxOpenConnections int) *Postgres 
 
 	postgresDB.db = db
 	log.Info("Connected to Postgres DB")
+
+	postgresDB.Migrate()
 	return &postgresDB
+}
+
+func (postgresDB *Postgres) Migrate() {
+	if err := postgresDB.db.Migrator().DropTable(&domain.User{}, &domain.RefreshToken{}); err != nil {
+		log.Fatal("failed to drop tables:", err)
+	}
+
+	if err := postgresDB.db.AutoMigrate(&domain.User{}, &domain.RefreshToken{}); err != nil {
+		log.Fatal("failed to create tables:", err)
+	}
+
+	user := domain.User{
+		Guid:  "123",
+		Email: "example@gmail.com",
+		IP:    "456789",
+	}
+	if err := postgresDB.db.Create(&user).Error; err != nil {
+		log.Fatal("failed to insert data into users table:", err)
+	}
 }
 
 func (postgresDB *Postgres) GetDB() *gorm.DB {

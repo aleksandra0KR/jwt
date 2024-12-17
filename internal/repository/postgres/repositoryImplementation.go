@@ -68,8 +68,11 @@ func (rp *RepositoryPostgres) DeleteRefreshToken(guid string) error {
 
 func (rp *RepositoryPostgres) GetRefreshToken(guid string) (*domain.RefreshToken, error) {
 	var refreshToken domain.RefreshToken
-	rp.db.Where("user_guid = ?", guid).First(&refreshToken)
-	if rp.db.Error != nil {
+	result := rp.db.Where("user_guid = ?", guid).Find(&refreshToken)
+	if result.Error != nil {
+		if errors.Is(gorm.ErrRecordNotFound, result.Error) {
+			return nil, nil
+		}
 		log.Println(rp.db.Error)
 		return nil, rp.db.Error
 	}

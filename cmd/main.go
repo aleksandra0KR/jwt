@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	handler "jwt/internal/contoller"
 	"jwt/internal/repository"
@@ -12,6 +13,10 @@ import (
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("error loading .env file")
+	}
+
 	port := os.Getenv("HTTP_PORT")
 	db := database.InitializeDBPostgres(3, 10)
 	logger.InitLogger()
