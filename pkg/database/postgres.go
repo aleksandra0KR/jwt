@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"jwt/domain"
 	"os"
+	"time"
 )
 
 type Postgres struct {
@@ -29,9 +30,22 @@ func InitializeDBPostgres(maxIdleConnections, maxOpenConnections int) *Postgres 
 
 	connectionDBUrl := fmt.Sprintf(`host=%s user=%s password=%s dbname=%s port=%s`, dbHost, dbUser, dbPassword, dbName, dbPort)
 	log.Infof(connectionDBUrl)
-	db, err := gorm.Open(postgres.Open(connectionDBUrl), &gorm.Config{})
+
+	var db *gorm.DB
+	var err error
+	maxRetries := 10
+	retryDelay := 5 * time.Second
+
+	for i := 0; i < maxRetries; i++ {
+		db, err = gorm.Open(postgres.Open(connectionDBUrl), &gorm.Config{})
+		if err == nil {
+			break
+		}
+		log.Warnf("failed to connect to database: %v. Retrying in %v...", err, retryDelay)
+		time.Sleep(retryDelay)
+	}
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("failed to connect to database after %d retries: %v", maxRetries, err)
 	}
 	postgresDB.db = db
 
@@ -43,7 +57,7 @@ func InitializeDBPostgres(maxIdleConnections, maxOpenConnections int) *Postgres 
 	sqlDB.SetMaxOpenConns(postgresDB.MaxOpenConnections)
 
 	postgresDB.db = db
-	log.Info("Connected to Postgres DB")
+	log.Info("connected to Postgres DB")
 
 	postgresDB.Migrate()
 	return &postgresDB
