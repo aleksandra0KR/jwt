@@ -9,17 +9,20 @@ import (
 func (h *Handler) Auth(c *gin.Context) {
 	var user domain.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(domain.BadRequestStatusResponse, gin.H{"error": gin.H{"code": domain.BadRequestStatusResponse, "text": "invalid input"}})
+		c.JSON(domain.BadRequestStatusResponse,
+			gin.H{"error": gin.H{"code": domain.BadRequestStatusResponse, "text": "invalid input"}})
 		return
 	}
 
 	err := (*h.service).Auth(&user)
 	if err != nil {
 		if err.Error() == "user not found" {
-			c.JSON(domain.UnauthorizedStatusResponse, gin.H{"error": gin.H{"code": domain.UnauthorizedStatusResponse, "text": err.Error()}})
+			c.JSON(domain.UnauthorizedStatusResponse,
+				gin.H{"error": gin.H{"code": domain.UnauthorizedStatusResponse, "text": err.Error()}})
 			return
 		}
-		c.JSON(domain.InternalServerErrorStatusResponse, gin.H{"error": gin.H{"code": domain.InternalServerErrorStatusResponse, "text": err.Error()}})
+		c.JSON(domain.InternalServerErrorStatusResponse,
+			gin.H{"error": gin.H{"code": domain.InternalServerErrorStatusResponse, "text": err.Error()}})
 		return
 	}
 
@@ -28,25 +31,29 @@ func (h *Handler) Auth(c *gin.Context) {
 	c.SetCookie("accessToken", user.AccessToken, int(expirationTime.Unix()), "/", "localhost", false, true)
 	c.SetCookie("refreshToken", user.RefreshToken, int(ex.Unix()), "/", "localhost", false, true)
 
-	c.JSON(domain.SuccessfulStatusResponse, gin.H{"response": gin.H{"accessToken": user.AccessToken, "refreshToken": user.RefreshToken}})
+	c.JSON(domain.SuccessfulStatusResponse,
+		gin.H{"response": gin.H{"accessToken": user.AccessToken, "refreshToken": user.RefreshToken}})
 }
 
 func (h *Handler) RefreshToken(c *gin.Context) {
 	accessToken, err := c.Cookie("accessToken")
 	if err != nil {
-		c.JSON(domain.UnauthorizedStatusResponse, gin.H{"error": gin.H{"code": domain.UnauthorizedStatusResponse, "text": "unauthorized"}})
+		c.JSON(domain.UnauthorizedStatusResponse,
+			gin.H{"error": gin.H{"code": domain.UnauthorizedStatusResponse, "text": "unauthorized"}})
 		return
 	}
 
 	refreshToken, err := c.Cookie("refreshToken")
 	if err != nil {
-		c.JSON(domain.UnauthorizedStatusResponse, gin.H{"error": gin.H{"code": domain.UnauthorizedStatusResponse, "text": "unauthorized"}})
+		c.JSON(domain.UnauthorizedStatusResponse,
+			gin.H{"error": gin.H{"code": domain.UnauthorizedStatusResponse, "text": "unauthorized"}})
 		return
 	}
 
 	var user *domain.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(domain.BadRequestStatusResponse, gin.H{"error": gin.H{"code": domain.BadRequestStatusResponse, "text": "invalid input"}})
+		c.JSON(domain.BadRequestStatusResponse,
+			gin.H{"error": gin.H{"code": domain.BadRequestStatusResponse, "text": "invalid input"}})
 		return
 	}
 
@@ -54,7 +61,8 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 	user.RefreshToken = refreshToken
 	err, user = (*h.service).RefreshToken(user)
 	if err != nil {
-		c.JSON(domain.BadRequestStatusResponse, gin.H{"error": gin.H{"code": domain.BadRequestStatusResponse, "text": "invalid input"}})
+		c.JSON(domain.BadRequestStatusResponse,
+			gin.H{"error": gin.H{"code": domain.BadRequestStatusResponse, "text": "invalid input"}})
 		return
 	}
 
@@ -63,5 +71,6 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 	c.SetCookie("accessToken", user.AccessToken, int(expirationTime.Unix()), "/", "localhost", false, true)
 	c.SetCookie("refreshToken", user.RefreshToken, int(ex.Unix()), "/", "localhost", false, true)
 
-	c.JSON(domain.SuccessfulStatusResponse, gin.H{"response": gin.H{"accessToken": user.AccessToken, "refreshToken": user.RefreshToken}})
+	c.JSON(domain.SuccessfulStatusResponse,
+		gin.H{"response": gin.H{"accessToken": user.AccessToken, "refreshToken": user.RefreshToken}})
 }

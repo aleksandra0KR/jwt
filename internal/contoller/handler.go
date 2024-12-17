@@ -22,7 +22,8 @@ func (h *Handler) Handle() http.Handler {
 	router.POST("/api/auth", h.Auth)
 
 	router.NoRoute(func(c *gin.Context) {
-		c.JSON(domain.NotImplementedStatusResponse, gin.H{"code": domain.NotImplementedStatusResponse, "error": "not implemented"})
+		c.JSON(domain.NotImplementedStatusResponse,
+			gin.H{"code": domain.NotImplementedStatusResponse, "error": "not implemented"})
 	})
 	return router
 }
