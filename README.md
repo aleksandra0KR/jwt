@@ -54,7 +54,7 @@ go run cmd/main.go
       "IP"    :     "456789"
   }
   ```
-  ![](https://github.com/aleksandra0KR/jwt/tree/main/examples/1.png?raw=true)- 
+  ![](https://github.com/aleksandra0KR/jwt/blob/main/examples/1.png?raw=true)
 - Второй маршрут Метод POST
   ```
   localhost:8080/api/refreshToken/123
@@ -66,4 +66,4 @@ go run cmd/main.go
       "IP"    :     "456789"
   }
   ```
-  ![](https://github.com/aleksandra0KR/jwt/tree/main/examples/2.png?raw=true)
+  ![](https://github.com/aleksandra0KR/jwt/blob/main/examples/2.png?raw=true)
