@@ -18,8 +18,8 @@ func NewHandler(service *usecase.UseCase) *Handler {
 func (h *Handler) Handle() http.Handler {
 	router := gin.Default()
 
-	router.POST("/api/refreshToken", h.RefreshToken)
-	router.POST("/api/auth", h.Auth)
+	router.POST("/api/refreshToken/:guid", h.RefreshToken)
+	router.POST("/api/auth/:guid", h.Auth)
 
 	router.NoRoute(func(c *gin.Context) {
 		c.JSON(domain.NotImplementedStatusResponse,

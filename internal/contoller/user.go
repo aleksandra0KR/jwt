@@ -13,6 +13,8 @@ func (h *Handler) Auth(c *gin.Context) {
 			gin.H{"error": gin.H{"code": domain.BadRequestStatusResponse, "text": "invalid input"}})
 		return
 	}
+	guid := c.Param("guid")
+	user.Guid = guid
 
 	err := (*h.service).Auth(&user)
 	if err != nil {
@@ -56,6 +58,8 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 			gin.H{"error": gin.H{"code": domain.BadRequestStatusResponse, "text": "invalid input"}})
 		return
 	}
+	guid := c.Param("guid")
+	user.Guid = guid
 
 	user.AccessToken = accessToken
 	user.RefreshToken = refreshToken
